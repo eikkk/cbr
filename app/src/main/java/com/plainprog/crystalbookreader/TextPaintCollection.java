@@ -30,7 +30,7 @@ public class TextPaintCollection
         Paint paint = new Paint();
         paint.setTextSize(textSize);
         paint.setAntiAlias(true);
-        switch (text.getTextType()) {
+        switch (text.getSettings().getTextType()) {
             default:
             case NORMAL:
                 paint.setTypeface(Typeface.DEFAULT);
@@ -45,7 +45,7 @@ public class TextPaintCollection
                 paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
                 break;
         }
-        switch (text.getTextSize()) {
+        switch (text.getSettings().getTextSize()) {
             case H1: {
                 paint.setTextSize(textSize * 2);
                 break;

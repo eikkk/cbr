@@ -18,7 +18,7 @@ public class Paragraph {
             String[] words = text.getValue().split("(?=;)");
             for(int i = 0; i < words.length; i++)
                 if (!words[i].isEmpty())
-                    result.add(new Word(words[i], text.getTextType()));
+                    result.add(new Word(words[i], text.getSettings()));
         }
         this.content = result;
     }

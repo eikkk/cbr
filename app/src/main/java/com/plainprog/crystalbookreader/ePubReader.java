@@ -1,9 +1,13 @@
 package com.plainprog.crystalbookreader;
 
+import org.xml.sax.SAXException;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubReader;
@@ -44,8 +48,8 @@ public class ePubReader implements BookReaderBridge {
               str = new String(resource.getData());
               TextSAXParser parser = new TextSAXParser();
               chapters.add(new Chapter(parser.parse(str)));
-            } catch (Exception e) {
-
+            } catch (ParserConfigurationException|SAXException|IOException e) {
+                
             }
         }
         book.setTitle(title);

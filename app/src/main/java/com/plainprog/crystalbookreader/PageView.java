@@ -129,7 +129,7 @@ public class PageView extends View {
     }
     private void DrawText(Text text, Canvas canvas,float x, float y)
     {
-        Paint paint = new Paint(paints.getPaintForText(text.getTextType()));
+        Paint paint = new Paint(paints.getPaintForText(text));
         paint.setColor(Color.parseColor("#000000"));
         //text.RenderHeight = y;
         //text.StartWidth = x;

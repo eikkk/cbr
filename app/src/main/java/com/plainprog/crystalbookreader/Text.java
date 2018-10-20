@@ -1,54 +1,31 @@
 package com.plainprog.crystalbookreader;
 
 public class Text {
+
     private String value;
-
-    public TextType getTextType() {
-        return textType;
-    }
-
-    public void setTextType(TextType textType) {
-        this.textType = textType;
-    }
-
-    public TextSize getTextSize() {
-        return textSize;
-    }
-
-    public void setTextSize(TextSize textSize) {
-        this.textSize = textSize;
-    }
-
-    public TextSpecification getTextSpecification() {
-        return textSpecification;
-    }
-
-    public void setTextSpecification(TextSpecification textSpecification) {
-        this.textSpecification = textSpecification;
-    }
-
-    public TextPosition getTextPosition() {
-        return textPosition;
-    }
-
-    public void setTextPosition(TextPosition textPosition) {
-        this.textPosition = textPosition;
-    }
-
-    private TextType textType;
-    private TextSize textSize;
-    private TextSpecification textSpecification;
-    private TextPosition textPosition;
+    private TextSettings settings;
 
     public Text(String value){
         this.value = value;
-        this.textType = TextType.NORMAL;
-        this.textSize = TextSize.NORMAL;
-        this.textSpecification = TextSpecification.NONE;
-        this.textPosition = TextPosition.NORMAL;
+        this.settings = new TextSettings();
+        this.settings.setTextType(TextType.NORMAL);
+        this.settings.setTextSize(TextSize.NORMAL);
+        this.settings.setTextSpecification(TextSpecification.NONE);
+        this.settings.setTextPosition(TextPosition.NORMAL);
     }
 
+    public TextSettings getSettings() {
+        return settings;
+    }
 
+    public  Text(Text text){
+        value = new String(text.getValue());
+        settings = new TextSettings(text.getSettings());
+    }
+    public Text(String value, TextSettings settings){
+        this.value = value;
+        this.settings = new TextSettings(settings);
+    }
 
     public String getValue() {
         return value;
@@ -56,7 +33,7 @@ public class Text {
 
     public boolean isHeader()
     {
-        if (textSize == TextSize.H1 || textSize == TextSize.H2 || textSize == TextSize.H3 ||textSize == TextSize.H4 || textSize == TextSize.H5 || textSize == TextSize.H6)
+        if (settings.getTextSize() == TextSize.H1 || settings.getTextSize() == TextSize.H2 || settings.getTextSize() == TextSize.H3 ||settings.getTextSize() == TextSize.H4 || settings.getTextSize() == TextSize.H5 || settings.getTextSize() == TextSize.H6)
             return true;
         else
             return false;

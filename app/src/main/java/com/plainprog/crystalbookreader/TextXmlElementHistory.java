@@ -17,7 +17,7 @@ public class TextXmlElementHistory {
         nodeHistory.add(nodeName);
     }
     public void removeFromHistory(String nodeName){
-        for (int i = nodeHistory.size(); i >= 0; i--){
+        for (int i = nodeHistory.size()-1; i >= 0; i--){
             if (nodeHistory.get(i).equals(nodeName)){
                 nodeHistory.remove(i);
                 return;
