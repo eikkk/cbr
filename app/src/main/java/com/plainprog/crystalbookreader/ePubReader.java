@@ -1,7 +1,11 @@
 package com.plainprog.crystalbookreader;
 
+import android.content.Context;
+import android.os.Environment;
+
 import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,13 +18,13 @@ import nl.siegmann.epublib.epub.EpubReader;
 
 public class ePubReader implements BookReaderBridge {
     @Override
-    public Book read(String filepath) {
+    public Book read(File file, Context context) {
         ePubBook book = new ePubBook();
         // find InputStream for book
         InputStream epubInputStream = null;
         try {
-            epubInputStream = ReadingActivity.manager
-                    .open("eng.epub");
+            epubInputStream = new FileInputStream(file);
+            //epubInputStream = ReadingActivity.manager.open("eng.epub");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,10 +47,12 @@ public class ePubReader implements BookReaderBridge {
         ArrayList<Chapter> chapters = new ArrayList<>();
         for (int i = 0; i < tempBook.getSpine().size(); i++){
             Resource resource = tempBook.getSpine().getResource(i);
+            String test = tempBook.getOpfResource().getHref();
             String str;
             try {
               str = new String(resource.getData());
               TextSAXParser parser = new TextSAXParser();
+              ePubDOMReader readerDOM = new ePubDOMReader(file,str, file.toURI().toURL(), context);
               chapters.add(new Chapter(parser.parse(str)));
             } catch (ParserConfigurationException|SAXException|IOException e) {
                 
