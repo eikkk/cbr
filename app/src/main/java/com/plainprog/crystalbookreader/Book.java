@@ -18,7 +18,7 @@ public abstract class Book {
 
     private String title;
     private ArrayList<Author> authors;
-    ArrayList<Chapter> chapters;
+    private ArrayList<Chapter> chapters;
 
     public String getTitle() {
         return title;

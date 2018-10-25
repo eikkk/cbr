@@ -1,44 +1,27 @@
 package com.plainprog.crystalbookreader;
 
+import android.graphics.Point;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Pagination {
-    ArrayList<PaginatedChapter> paginatedChapters;
-    ArrayList<Page> pages;
-    float screenHeight;
-    float screenWidth;
-    float paddingLeft;
+    private ArrayList<PaginatedChapter> paginatedChapters;
+    private ArrayList<Page> pages;
 
-    public float getScreenHeight() {
-        return screenHeight;
+    public Point getDisplayDimensions() {
+        return displayDimensions;
     }
 
-    public float getScreenWidth() {
-        return screenWidth;
+    private Point displayDimensions;
+
+    public Paddings getPaddings() {
+        return paddings;
     }
 
-    public float getPaddingLeft() {
-        return paddingLeft;
-    }
-
-    public float getPaddingRight() {
-        return paddingRight;
-    }
-
-    public float getPaddingTop() {
-        return paddingTop;
-    }
-
-    public float getPaddingBottom() {
-        return paddingBottom;
-    }
-
-    float paddingRight;
-    float paddingTop;
-    float paddingBottom;
-    TextPaintCollection paints;
-    int count = 0;
+    private Paddings paddings;
+    private TextPaintCollection paints;
+    private int count = 0;
     public TextPaintCollection getPaints()
     {
         return paints;
@@ -55,17 +38,13 @@ public class Pagination {
     {
             return pages.size();
     }
-    public Pagination(ArrayList<Chapter> chapters, float screenHeight, float screenWidth, TextPaintCollection paints, float paddingLeft, float paddingRight, float paddingTop, float paddingBottom)
+    public Pagination(Book book, Point displayDimensions , TextPaintCollection paints, Paddings paddings)
     {
         this.paints = paints;
-        this.screenHeight = screenHeight;
-        this.screenWidth = screenWidth;
-        this.paddingBottom = paddingBottom;
-        this.paddingLeft = paddingLeft;
-        this.paddingRight = paddingRight;
-        this.paddingTop = paddingTop;
+        this.displayDimensions = displayDimensions;
+        this.paddings = paddings;
 
-        paginatedChapters = Paginate(chapters, screenHeight - paddingBottom - paddingTop, screenWidth -paddingLeft - paddingRight, paints);
+        paginatedChapters = Paginate(book.getChapters(), displayDimensions.y - paddings.getPaddingBottom() - paddings.getPaddingTop(), displayDimensions.x -paddings.getPaddingLeft() - paddings.getPaddingRight(), paints);
 
 
         pages = new ArrayList<>();

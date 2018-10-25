@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -23,10 +24,10 @@ public class PageView extends View {
         super(context, attrs);
         this.context = context;
     }
-    public PageView(Context context, TextPaintCollection paints, Page page, Paddings paddings, float screenWidth, float screenHeight) {
+    public PageView(Context context, TextPaintCollection paints, Page page, Paddings paddings, Point displayDimensions) {
         super(context);
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
+        this.screenWidth = displayDimensions.x;
+        this.screenHeight = displayDimensions.y;
         this.paints = paints;
         this.context = context;
         this.page = page;
@@ -35,10 +36,10 @@ public class PageView extends View {
         //mDarchSentence = darchSentence;
         //mColor = color;
     }
-    public PageView(Context context, TextPaintCollection paints, Page page, Paddings paddings, float screenWidth, float screenHeight,  Page nextPage, Page previousPage) {
+    public PageView(Context context, TextPaintCollection paints, Page page, Paddings paddings, Point displayDimensions,  Page nextPage, Page previousPage) {
         super(context);
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
+        this.screenWidth = displayDimensions.x;
+        this.screenHeight = displayDimensions.y;
         this.paints = paints;
         this.context = context;
         this.page = page;

@@ -3,12 +3,15 @@ package com.plainprog.crystalbookreader;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.graphics.Point;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Display;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,24 +20,36 @@ import java.io.File;
 public class ReadingActivity extends AppCompatActivity {
     private File file;
     private Book book;
-    private  TextView textView;
+    ViewPager viewPager;
     private boolean hasPermission = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_reading);
-        textView = findViewById(R.id.textView);
-
+        viewPager = findViewById(R.id.viewPager);
 
         checkPermissions();
         if (hasPermission){
             file = getFileForTest();
             readTestFile();
-            showBookInTextView(textView, book);
+            setupViewPager(viewPager);
         }
         else Toast.makeText(this, "No permission for reading", Toast.LENGTH_SHORT).show();
     }
+    private void setupViewPager(ViewPager viewPager){
 
+        int textSize = 40;
+        Paddings paddings = new Paddings(10,10,10,10);
+        Pagination pagination = new Pagination(book,getDisplayDimensions(),new TextPaintCollection(textSize),paddings);
+        ViewPagerBookAdapter adapter = new ViewPagerBookAdapter(this, pagination);
+        viewPager.setAdapter(adapter);
+    }
+    private Point getDisplayDimensions(){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return size;
+    }
     private void checkPermissions(){
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)

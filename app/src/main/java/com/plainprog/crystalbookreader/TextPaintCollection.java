@@ -21,6 +21,7 @@ public class TextPaintCollection
 
     public TextPaintCollection(float textSize) {
         this.textSize = textSize;
+        helper = new TextPaintHelper(this);
     }
 
     public Paint getPaintForText(Text text)

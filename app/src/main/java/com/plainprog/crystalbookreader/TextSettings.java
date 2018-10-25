@@ -9,13 +9,17 @@ public class TextSettings {
         this.textSpecification = specification;
     }
     public  TextSettings(TextSettings settings){
-        this.textSpecification = settings.getTextSpecification();
+        this.textType = settings.getTextType();
         this.textSize = settings.getTextSize();
         this.textPosition = settings.getTextPosition();
         this.textSpecification = settings.getTextSpecification();
     }
 
     public TextSettings() {
+        textType = TextType.NORMAL;
+        textSize = TextSize.NORMAL;
+        textSpecification = TextSpecification.NONE;
+        textPosition = TextPosition.NORMAL;
     }
 
     private TextType textType;
