@@ -1,7 +1,6 @@
 package com.plainprog.crystalbookreader;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Environment;
@@ -78,10 +77,11 @@ private File file;
         StringBuilder tempContent = new StringBuilder();
         for (Chapter chapter : book.getChapters()){
             tempContent.append("-------CHAPTER------");
-            for (Paragraph paragraph: chapter.getParagraphs()){
+            for (BookItem bookItem: chapter.getBookItems()){
                 tempContent.append("---PARAGRAPH------");
-                for (Text word : paragraph.getContent())
-                    tempContent.append(word.getValue());
+                if (bookItem instanceof BookTextItem)
+                    for (Text word : ((BookTextItem)bookItem).getContent())
+                        tempContent.append(word.getValue());
             }
         }
         textView.setText(tempContent.toString());

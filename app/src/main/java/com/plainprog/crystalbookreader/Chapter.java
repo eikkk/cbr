@@ -14,14 +14,14 @@ public class Chapter {
 
     private String title;
 
-    private ArrayList<Paragraph> paragraphs;
+    private ArrayList<BookItem> bookItems;
 
-    public Chapter(ArrayList<Paragraph> paragraphs) {
-        this.paragraphs = paragraphs;
+    public Chapter(ArrayList<BookItem> bookItems) {
+        this.bookItems = bookItems;
         title = "";
     }
 
-    public ArrayList<Paragraph> getParagraphs() {
-        return paragraphs;
+    public ArrayList<BookItem> getBookItems() {
+        return bookItems;
     }
 }

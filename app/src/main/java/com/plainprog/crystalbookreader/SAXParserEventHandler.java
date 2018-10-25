@@ -7,11 +7,11 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.util.ArrayList;
 
 public class SAXParserEventHandler extends DefaultHandler {
-    public ArrayList<Paragraph> getResult(){
-        return  paragraphs;
+    public ArrayList<BookItem> getResult(){
+        return bookItems;
     }
     public String getTitle(){return  title;}
-    private ArrayList<Paragraph> paragraphs;
+    private ArrayList<BookItem> bookItems;
     private ArrayList<Text> currentParagraph;
     private TextXmlElementHistory nodeHistory;
     private StringBuilder currentString;
@@ -19,7 +19,7 @@ public class SAXParserEventHandler extends DefaultHandler {
     private String title;
     private boolean processFinished;
     public SAXParserEventHandler(){
-        paragraphs = new ArrayList<>();
+        bookItems = new ArrayList<>();
         currentParagraph = new ArrayList<>();
         nodeHistory = new TextXmlElementHistory();
         currentString = new StringBuilder();
@@ -58,9 +58,9 @@ public class SAXParserEventHandler extends DefaultHandler {
                     currentParagraph.add(new Text(currentString.toString()));
                 }
                 currentString = new StringBuilder();
-                Paragraph paragraph = new Paragraph(currentParagraph, true);
+                BookTextItem paragraph = new BookTextItem(currentParagraph, true);
                 currentParagraph = new ArrayList<>();
-                paragraphs.add(paragraph);
+                bookItems.add(paragraph);
                 nodeHistory.removeFromHistory(localName);
                 return;
             /*case "b":

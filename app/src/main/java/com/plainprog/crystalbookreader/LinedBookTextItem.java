@@ -2,15 +2,15 @@ package com.plainprog.crystalbookreader;
 
 import java.util.ArrayList;
 
-public class LinedParagraph extends Paragraph {
+public class LinedBookTextItem extends BookTextItem {
 
-    public LinedParagraph(ArrayList<Word> content, ArrayList<Line> lines) {
+    public LinedBookTextItem(ArrayList<Word> content, ArrayList<Line> lines) {
         super(content);
         this.lines = lines;
     }
 
-    public LinedParagraph(Paragraph paragraph, ArrayList<Line> lines) {
-        super(paragraph);
+    public LinedBookTextItem(BookTextItem bookTextItem, ArrayList<Line> lines) {
+        super(bookTextItem);
         this.lines = lines;
     }
 

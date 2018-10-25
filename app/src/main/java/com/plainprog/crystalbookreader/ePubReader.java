@@ -17,10 +17,32 @@ import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubReader;
 
 public class ePubReader implements BookReaderBridge {
+    private nl.siegmann.epublib.domain.Book tempBook;
+    private File epubFile;
     @Override
     public Book read(File file, Context context) {
         ePubBook book = new ePubBook();
-        // find InputStream for book
+        initializeEpubLibBook(file);
+
+        String title = tempBook.getTitle();
+        ArrayList<nl.siegmann.epublib.domain.Author> tempAuthors = new ArrayList<>(tempBook.getMetadata().getAuthors());
+        ArrayList<Author> authors = new ArrayList<>();
+        for (nl.siegmann.epublib.domain.Author item: tempAuthors)
+            authors.add(new Author(item.getFirstname() + item.getLastname()));
+
+
+        ArrayList<Chapter> chapters;
+        if (false)
+            chapters = readWithSAX();
+        else
+            chapters = readWithDOM(file,context);
+
+        book.setTitle(title);
+        book.setAuthors(authors);
+        book.setChapters(chapters);
+        return book;
+    }
+    private void initializeEpubLibBook(File file){
         InputStream epubInputStream = null;
         try {
             epubInputStream = new FileInputStream(file);
@@ -30,38 +52,45 @@ public class ePubReader implements BookReaderBridge {
         }
 
         // Load Book from inputStream
-        nl.siegmann.epublib.domain.Book tempBook = null;
+        tempBook = null;
         try {
             tempBook = (new EpubReader()).readEpub(epubInputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        String title = tempBook.getTitle();
-        ArrayList<nl.siegmann.epublib.domain.Author> tempAuthors = new ArrayList<>(tempBook.getMetadata().getAuthors());
-        ArrayList<Author> authors = new ArrayList<>();
-        for (nl.siegmann.epublib.domain.Author item: tempAuthors)
-            authors.add(new Author(item.getFirstname() + item.getLastname()));
-
-
+    }
+    private ArrayList<Chapter> readWithDOM(File epubFile, Context context){
+        ArrayList<Chapter> chapters = new ArrayList<>();
+        ePubDOMReader reader = new ePubDOMReader(epubFile, context);
+        for (int i = 0; i < tempBook.getSpine().size(); i++){
+            Resource resource = tempBook.getSpine().getResource(i);
+            String str;
+            try {
+                str = new String(resource.getData());
+                chapters.add(reader.parse(str));
+            } catch (IOException e) {
+                reader.processedFinished();
+                e.printStackTrace();
+            }
+        }
+        reader.processedFinished();
+        return  chapters;
+    }
+    private ArrayList<Chapter> readWithSAX(){
         ArrayList<Chapter> chapters = new ArrayList<>();
         for (int i = 0; i < tempBook.getSpine().size(); i++){
             Resource resource = tempBook.getSpine().getResource(i);
-            String test = tempBook.getOpfResource().getHref();
+            //String test = tempBook.getOpfResource().getHref();
             String str;
             try {
-              str = new String(resource.getData());
-              TextSAXParser parser = new TextSAXParser();
-              ePubDOMReader readerDOM = new ePubDOMReader(file,str, file.toURI().toURL(), context);
-              chapters.add(new Chapter(parser.parse(str)));
+                str = new String(resource.getData());
+                    TextSAXParser parser = new TextSAXParser();
+                    chapters.add(new Chapter(parser.parse(str)));
             } catch (ParserConfigurationException|SAXException|IOException e) {
-                
+
             }
         }
-        book.setTitle(title);
-        book.setAuthors(authors);
-        book.setChapters(chapters);
-        return book;
+        return  chapters;
     }
     public ePubReader(){}
 }

@@ -1,7 +1,5 @@
 package com.plainprog.crystalbookreader;
 
-import android.graphics.Paint;
-
 import java.util.ArrayList;
 
 public class LineBreaker
@@ -23,15 +21,18 @@ public class LineBreaker
     private LinedChapter BreakChapter(Chapter chapter, TextPaintCollection paints, float maxWidth)
     {
         //char[] separators = new char[] {' '};
-        ArrayList<LinedParagraph> linedParagraphs = new ArrayList<>();
-        for(Paragraph paragraph : chapter.getParagraphs()) {
-            LinedParagraph linedParagraph = BreakParagraph(paragraph, paints, maxWidth);
-            linedParagraphs.add(linedParagraph);
+        ArrayList<LinedBookTextItem> linedParagraphs = new ArrayList<>();
+        for(BookItem bookItem : chapter.getBookItems()) {
+            if (bookItem instanceof BookTextItem){
+                LinedBookTextItem linedParagraph = BreakParagraph((BookTextItem) bookItem, paints, maxWidth);
+                linedParagraphs.add(linedParagraph);
+            }
+
         }
         LinedChapter linedChapter = new LinedChapter(chapter, linedParagraphs);
         return linedChapter;
     }
-    private LinedParagraph BreakParagraph(Paragraph paragraph, TextPaintCollection paints, float maxWidth)
+    private LinedBookTextItem BreakParagraph(BookTextItem paragraph, TextPaintCollection paints, float maxWidth)
     {
         ArrayList<Line> lines = new ArrayList<>();
         //float lineheight = MeasureHeight(new Text("Some Text", TextType.NORMAL), paints);
@@ -88,7 +89,7 @@ public class LineBreaker
                     }
                 }
             }
-        LinedParagraph result = new LinedParagraph(paragraph, lines);
+        LinedBookTextItem result = new LinedBookTextItem(paragraph, lines);
         //result.LineSpacing = linespacing;
         return result;
     }

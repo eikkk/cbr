@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Environment;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import java.io.BufferedInputStream;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -31,57 +34,274 @@ import cz.vutbr.web.domassign.Analyzer;
 import cz.vutbr.web.domassign.StyleMap;
 
 public class ePubDOMReader {
+    private File epubFile;
     private Context context;
     private File unzippedDirectory;
     private URL baseURL;
     private Document document;
-    public ePubDOMReader(File file, String source, URL url, Context context){
-        // 1. unpack archive
+
+    private BookTextItem currentBookItem;
+    ArrayList<BookItem> chapterContent;
+    public ePubDOMReader(File epubFile, Context context){
+        this.epubFile = epubFile;
         this.context = context;
-        unzip(file);
+        unzipEPUB();
+    }
+    public void processedFinished(){
+        deleteRecursive(unzippedDirectory);
+    }
+    private void unzipEPUB(){
+        unzippedDirectory = context.getCacheDir();
+        try {
+            ZipFile zipFile = new ZipFile(epubFile.getPath());
+            zipFile.extractAll(unzippedDirectory.getPath());
+        } catch (ZipException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteRecursive(File fileOrDirectory) {
+
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+        }
+
+        fileOrDirectory.delete();
+    }
+    public Chapter parse(String source){
         // 2. create document
         document = createDocumentFromString(source);
         // 3. create map
         baseURL = getEpubBaseURL(unzippedDirectory);
         StyleMap map = CSSFactory.assignDOM(document, null,  baseURL, "screen", true);
-        // 4. create book object
-        // 5. serialize and save created object to file
-        // 6. delete unpacked
+        // 4. create chapter object
+        createChapter(document,map);
+        return new Chapter(chapterContent);
+    }
 
-
-
-
-        //get the element style
-        try {
-            //String pathToEpub = "jar:" + new File(Environment.getExternalStorageDirectory(), "eng.epub").toURI().toURL().getPath()+ "!/OPS";
-            //URL url1 = new URL(pathToEpub);
-            URL url1 = new File(Environment.getExternalStorageDirectory(), "epubContent/OPS/css/main.css").toURI().toURL();
-            //URL url1 = new URL("file:///android_asset/main.css");
-            //File css = ReadingActivity.manager.open("main.css");
-            //MediaSpec spec = new MediaSpec("screen");
-            StyleSheet styleSheet = CSSFactory.parse(url,null);
-            //Analyzer analyzer = new Analyzer(styleSheet);
-            //StyleMap map = analyzer.evaluateDOM(document,"screen", true);
-            //StyleMap map = CSSFactory.assignDOM(document, null,  url1, "screen", true);
-            int i = 0;
-        } catch (Exception e) {
-            e.printStackTrace();
+    private void createChapter(Document doc, StyleMap map){
+        //Chapter result = new Chapter();
+        chapterContent = new ArrayList<>();
+        NodeList nodes = doc.getChildNodes();
+        for (int i = 0; i< nodes.getLength(); i++)
+            processDOMElement(nodes.item(i));
+    }
+    private void processDOMElement(Node node){
+        NodeList nodes;
+        if (node.getNodeType() == Node.TEXT_NODE){
+            if (!node.getTextContent().isEmpty() && !node.getTextContent().trim().isEmpty())
+                currentBookItem.addContent(new Text(node.getTextContent()));
+            chapterContent.add(currentBookItem);
+            currentBookItem = new BookTextItem();
+            return;
         }
-        int i = 0;
-        //NodeData style = map.get();
-        //get the type of the assigned value
-        //CSSProperty.Margin mm = style.getProperty("margin-top");
-        //System.out.println("margin-top=" + mm);
-        //if a length is specified, obtain the exact value
-        //if (mm == Margin.length)
-        //{
-        //   TermLength mtop = style.getValue(TermLength.class, "margin-top");
-        //   System.out.println("value=" + mtop);
-        //}
+        /*if (node.getLocalName() == null){
+            processDOMElement(node);
+            return;
+        }*/
+        String nodeName = node.getNodeName().toLowerCase();
+        switch (nodeName){
+            case "p":
+            case "h1":
+            case "h2":
+            case "h3":
+            case "h4":
+            case "h5":
+            case "h6":
+            case "a":
+            case "abbr":
+            case "acronym":
+            case "address":
+            case "article":
+            case "aside":
+            case "audio":
+            case "b":
+            case "bdo":
+            case "big":
+            case "blockquote":
+            case "br":
+            case "caption":
+            case "center":
+            case "cite":
+            case "code":
+            case "data":
+            case "del":
+            case "dfn":
+            case "em":
+            case "font":
+            case "i":
+            case "ins":
+            case "kbd":
+            case "label":
+            case "link":
+            case "mark":
+            case "pre":
+            case "q":
+            case "s":
+            case "small":
+            case "span":
+            case "strike":
+            case "strong":
+            case "sub":
+            case "sup":
+            case "tt":
+            case "u":
+            case "var":
+                processDOMElementAsBookItem(node);
+                return;
+            default:
+                NodeList children = node.getChildNodes();
+                for (int i =0; i < children.getLength(); i ++)
+                    processDOMElement(children.item(i));
+                return;
+        // dir, ol, ul, dr - lists
+        }
+    }
+    private void processDOMElementAsBookItem(Node node){
+
+        NodeList nodes;
+        String nodeName = node.getNodeName().toLowerCase();
+        switch (nodeName){
+            case "p":
+                currentBookItem = new ParagraphItem();
+                nodes = node.getChildNodes();
+                for (int i = 0; i< nodes.getLength(); i++)
+                    processDOMElementAsPartOfBookItem(nodes.item(i));
+                chapterContent.add(currentBookItem);
+                currentBookItem = new BookTextItem();
+                return;
+            case "h1":
+            case "h2":
+            case "h3":
+            case "h4":
+            case "h5":
+            case "h6":
+                currentBookItem = new HeaderItem();
+                nodes = node.getChildNodes();
+                for (int i = 0; i< nodes.getLength(); i++)
+                    processDOMElementAsPartOfBookItem(nodes.item(i));
+                chapterContent.add(currentBookItem);
+                currentBookItem = new BookTextItem();
+                return;
+            case "a":
+            case "abbr":
+            case "acronym":
+            case "address":
+            case "article":
+            case "aside":
+            case "audio":
+            case "b":
+            case "bdo":
+            case "big":
+            case "blockquote":
+            case "br":
+            case "caption":
+            case "center":
+            case "cite":
+            case "code":
+            case "data":
+            case "del":
+            case "dfn":
+            case "em":
+            case "font":
+            case "i":
+            case "ins":
+            case "kbd":
+            case "label":
+            case "link":
+            case "mark":
+            case "pre":
+            case "q":
+            case "s":
+            case "small":
+            case "span":
+            case "strike":
+            case "strong":
+            case "sub":
+            case "sup":
+            case "tt":
+            case "u":
+            case "var":
+                currentBookItem = new BookTextItem();
+                nodes = node.getChildNodes();
+                for (int i = 0; i< nodes.getLength(); i++)
+                    processDOMElementAsPartOfBookItem(nodes.item(i));
+                chapterContent.add(currentBookItem);
+                currentBookItem = new BookTextItem();
+                return;
+            // dir, ol, ul, dr - lists
+        }
+    }
+    private void processDOMElementAsPartOfBookItem(Node node){
+
+        if (node.getNodeType() == Node.TEXT_NODE){
+            if (!node.getTextContent().isEmpty() && !node.getTextContent().trim().isEmpty())
+                currentBookItem.addContent(new Text(node.getTextContent()));
+            return;
+        }
+
+        NodeList nodes;
+        String nodeName = node.getNodeName().toLowerCase();
+        switch (nodeName){
+            case "p":
+            case "h1":
+            case "h2":
+            case "h3":
+            case "h4":
+            case "h5":
+            case "h6":
+            case "a":
+            case "abbr":
+            case "acronym":
+            case "address":
+            case "article":
+            case "aside":
+            case "audio":
+            case "b":
+            case "bdo":
+            case "big":
+            case "blockquote":
+            case "br":
+            case "caption":
+            case "center":
+            case "cite":
+            case "code":
+            case "data":
+            case "del":
+            case "dfn":
+            case "em":
+            case "font":
+            case "i":
+            case "ins":
+            case "kbd":
+            case "label":
+            case "link":
+            case "mark":
+            case "pre":
+            case "q":
+            case "s":
+            case "small":
+            case "span":
+            case "strike":
+            case "strong":
+            case "sub":
+            case "sup":
+            case "tt":
+            case "u":
+            case "var":
+            default:
+                nodes = node.getChildNodes();
+                for (int i = 0; i< nodes.getLength(); i++)
+                    processDOMElementAsPartOfBookItem(nodes.item(i));
+                // dir, ol, ul, dr - lists
+        }
     }
     private Document createDocumentFromString(String source){
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
+        factory.setNamespaceAware(true);
         Document document;
         try {
             builder = factory.newDocumentBuilder();
@@ -94,17 +314,30 @@ public class ePubDOMReader {
     }
     private void unzip(File file ){
 
-        unzippedDirectory = context.getCacheDir();
-        try {
-            ZipFile zipFile = new ZipFile(file.getPath());
-            zipFile.extractAll(unzippedDirectory.getPath());
-        } catch (ZipException e) {
-            e.printStackTrace();
-        }
     }
-    private URL getEpubBaseURL(File searchDerictory) {
+    private File getOpfFile(File searchDirectory){
 
         FilenameFilter opfFilter = new FilenameFilter() {
+            public boolean accept(File dir, String filename)
+            { return filename.endsWith(".opf"); }
+        };
+        File[] opfFiles = searchDirectory.listFiles(opfFilter);
+        if (opfFiles.length > 0)
+            return  opfFiles[0];
+
+        File[] files = searchDirectory.listFiles();
+        for (int i =0; i < files.length; i++){
+            if (files[i].isDirectory()){
+                File opfFile = getOpfFile(files[i]);
+                if (opfFile != null)
+                    return opfFile;
+            }
+        }
+        return null;
+    }
+    private URL getEpubBaseURL(File searchDirectory) {
+
+        /*FilenameFilter opfFilter = new FilenameFilter() {
             File f;
             public boolean accept(File dir, String name) {
                 if(name.endsWith(".opf")) {
@@ -115,23 +348,22 @@ public class ePubDOMReader {
                 return f.isDirectory();
             }
         };
-        String files[] = searchDerictory.list(opfFilter);
-        if (files.length == 0)
-            return null;
-        else{
-            File opfFile = new File(files[0]);
-            File baseFolder = new File(opfFile.getParent());
-            if (baseFolder.exists() && baseFolder.isDirectory()) {
-                try {
-                    return baseFolder.toURI().toURL();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-            else return  null;
-        }
 
+        File[] files = searchDirectory.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String filename)
+            { return filename.endsWith(".opf"); }
+        } );*/
+
+        File opfFile = getOpfFile(searchDirectory);
+        if (opfFile != null) {
+            try {
+                return opfFile.getParentFile().toURI().toURL();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        else return null;
     }
     /*private void extractFolder(String zipFile,String extractFolder)
     {

@@ -5,12 +5,11 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import javax.xml.parsers.*;
 import org.xml.sax.*;
-import org.xml.sax.helpers.*;
 
 public class TextSAXParser{
     public TextSAXParser() {
     }
-    public ArrayList<Paragraph> parse(String content) throws ParserConfigurationException, SAXException, IOException {
+    public ArrayList<BookItem> parse(String content) throws ParserConfigurationException, SAXException, IOException {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
         SAXParser saxParser = spf.newSAXParser();
