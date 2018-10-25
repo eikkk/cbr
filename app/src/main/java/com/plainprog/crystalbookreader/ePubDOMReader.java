@@ -36,6 +36,7 @@ import cz.vutbr.web.domassign.StyleMap;
 public class ePubDOMReader {
     private File epubFile;
     private Context context;
+
     private File unzippedDirectory;
     private URL baseURL;
     private Document document;
@@ -45,6 +46,8 @@ public class ePubDOMReader {
     public ePubDOMReader(File epubFile, Context context){
         this.epubFile = epubFile;
         this.context = context;
+        currentBookItem = new BookTextItem();
+        chapterContent = new ArrayList<>();
         unzipEPUB();
     }
     public void processedFinished(){
@@ -91,10 +94,11 @@ public class ePubDOMReader {
     private void processDOMElement(Node node){
         NodeList nodes;
         if (node.getNodeType() == Node.TEXT_NODE){
-            if (!node.getTextContent().isEmpty() && !node.getTextContent().trim().isEmpty())
-                currentBookItem.addContent(new Text(node.getTextContent()));
+            if (!node.getTextContent().isEmpty() && !node.getTextContent().trim().isEmpty()){
+            currentBookItem.addContent(new Text(node.getTextContent()));
             chapterContent.add(currentBookItem);
             currentBookItem = new BookTextItem();
+            }
             return;
         }
         /*if (node.getLocalName() == null){

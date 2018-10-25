@@ -10,19 +10,32 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
 public class ReadingActivity extends AppCompatActivity {
-public static AssetManager manager;
-private File file;
+    private File file;
+    private Book book;
     private  TextView textView;
+    private boolean hasPermission = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_reading);
         textView = findViewById(R.id.textView);
-        manager = getAssets();
+
+
+        checkPermissions();
+        if (hasPermission){
+            file = getFileForTest();
+            readTestFile();
+            showBookInTextView(textView, book);
+        }
+        else Toast.makeText(this, "No permission for reading", Toast.LENGTH_SHORT).show();
+    }
+
+    private void checkPermissions(){
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -33,11 +46,8 @@ private File file;
 
         }
         else{
-            file = getFileForTest();
-            readTestFile();
+            hasPermission = true;
         }
-
-
     }
 
     @Override
@@ -47,8 +57,7 @@ private File file;
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    file = getFileForTest();
-                    readTestFile();
+                    ReadingActivity.this.recreate();
                 }else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -71,9 +80,10 @@ private File file;
         return  file;
     }
     private  void readTestFile(){
-
         BookReader reader = new BookReader();
-        Book book = reader.read(file, this);
+        book = reader.read(file, this);
+    }
+    private void showBookInTextView(TextView textView, Book book){
         StringBuilder tempContent = new StringBuilder();
         for (Chapter chapter : book.getChapters()){
             tempContent.append("-------CHAPTER------");
