@@ -30,7 +30,7 @@ public class BookTextItem extends BookItem {
 
     public void addContent(Text text){
         ArrayList<Word> result = new ArrayList<>();
-            String[] words = text.getValue().split("(?=;)");
+            String[] words = text.getValue().split("(?= )");
             for(int i = 0; i < words.length; i++)
                 if (!words[i].isEmpty())
                     result.add(new Word(words[i], text.getSettings()));

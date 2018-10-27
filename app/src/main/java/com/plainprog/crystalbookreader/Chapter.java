@@ -20,6 +20,10 @@ public class Chapter {
         this.bookItems = bookItems;
         title = "";
     }
+    public Chapter(Chapter chapter){
+        this.title = chapter.getTitle();
+        this.bookItems = chapter.getBookItems();
+    }
 
     public ArrayList<BookItem> getBookItems() {
         return bookItems;

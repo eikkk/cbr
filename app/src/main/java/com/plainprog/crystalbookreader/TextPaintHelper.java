@@ -12,7 +12,7 @@ public class TextPaintHelper {
         if (line == null || line.getContent().size() == 0)
             return 0;
         Paint paint = paints.getPaintForText(line.getContent().get(0));
-        return (paint.getFontMetrics().top + paint.getFontMetrics().bottom) * (-1);
+        return paint.getFontMetrics().descent - paint.getFontMetrics().ascent;
     }
     public float measureLine(Line line)
     {

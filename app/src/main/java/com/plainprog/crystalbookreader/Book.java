@@ -33,7 +33,10 @@ public abstract class Book {
     }
 
     public Book(){
-
     }
-
+    public Book(Book book){
+        this.title = book.title;
+        this.authors = book.authors;
+        this.chapters = book.chapters;
+    }
 }
