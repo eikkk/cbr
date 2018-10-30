@@ -16,7 +16,7 @@ public class Paginator {
 
     public Paginator(TextPaintCollection paints, float maxHeight, float maxWidth){
         this.paints = paints;
-        this.maxHeight = maxWidth;
+        this.maxHeight = maxHeight;
         this.maxWidth = maxWidth;
         currentHeight = 0f;
         currentPage = new Page();

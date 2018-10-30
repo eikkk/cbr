@@ -38,7 +38,7 @@ public class ReadingActivity extends AppCompatActivity {
     }
     private void setupViewPager(ViewPager viewPager){
 
-        int textSize = 40;
+        int textSize = 50;
         Paddings paddings = new Paddings(10,10,10,10);
         Pagination pagination = new Pagination(book,getDisplayDimensions(),new TextPaintCollection(textSize),paddings);
         ViewPagerBookAdapter adapter = new ViewPagerBookAdapter(this, pagination);
@@ -88,27 +88,12 @@ public class ReadingActivity extends AppCompatActivity {
     private File getFileForTest(){
 
         File sdcard = Environment.getExternalStorageDirectory();
-
-//Get the text file
         File file = new File(sdcard,"eng.epub");
-        String path = file.getPath();
         return  file;
     }
     private  void readTestFile(){
         BookReader reader = new BookReader();
         book = reader.read(file, this);
     }
-    private void showBookInTextView(TextView textView, Book book){
-        StringBuilder tempContent = new StringBuilder();
-        for (Chapter chapter : book.getChapters()){
-            tempContent.append("-------CHAPTER------");
-            for (BookItem bookItem: chapter.getBookItems()){
-                tempContent.append("---PARAGRAPH------");
-                if (bookItem instanceof BookTextItem)
-                    for (Text word : ((BookTextItem)bookItem).getContent())
-                        tempContent.append(word.getValue());
-            }
-        }
-        textView.setText(tempContent.toString());
-    }
+
 }

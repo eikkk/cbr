@@ -5,18 +5,26 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class PageView extends View {
     private Context context;
     private TextPaintCollection paints;
     private Page page;
-    private Page nextPage;
-    private Page previousPage;
     private Paddings paddings;
     private float screenWidth;
     private float screenHeight;
+    private  GestureDetector gestureDetector;
+    private boolean isCursorState;
+    private boolean isCursorMovingState;
+    private PointF cursorCoordinates;
+    private RectF cursorActual;
+    private RectF cursorForUserTouch;
     //bool mIsOriginal;
     //darchSentence mDarchSentence;
     //Android.Graphics.Color mColor = Color.Black;
@@ -32,34 +40,31 @@ public class PageView extends View {
         this.context = context;
         this.page = page;
         this.paddings = paddings;
+        gestureDetector = new GestureDetector(context, new GestureListener());
+        isCursorState  = false;
+        isCursorMovingState = false;
         //mIsOriginal = true;
         //mDarchSentence = darchSentence;
         //mColor = color;
     }
-    public PageView(Context context, TextPaintCollection paints, Page page, Paddings paddings, Point displayDimensions,  Page nextPage, Page previousPage) {
-        super(context);
-        this.screenWidth = displayDimensions.x;
-        this.screenHeight = displayDimensions.y;
-        this.paints = paints;
-        this.context = context;
-        this.page = page;
-        this.paddings = paddings;
-        this.nextPage = nextPage;
-        this.previousPage = previousPage;
-        //mIsOriginal = true;
-        //mDarchSentence = darchSentence;
-        //mColor = color;
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         DrawPage(page, canvas);
+        if (isCursorState)
+            DrawSelectionCursor(canvas, cursorCoordinates.y, cursorCoordinates.x,100,"#00ff00");
     }
-
-    private void DrawChapter(PaginatedChapter chapter, Canvas canvas)
-    {
-        for(Page page : chapter.getPages())
-            DrawPage(page, canvas);
+    private void DrawSelectionCursor(Canvas canvas, float y, float x, float stringHeight, String color){
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(Color.parseColor(color));
+        float cursorWidth = 20;
+        float left = x - cursorWidth;
+        float top = y - stringHeight;
+        float right = x;
+        float bottom = y;
+        cursorActual = new RectF(left,top,right,bottom);
+        float additionalCursorSpace = 20;
+        cursorForUserTouch = new RectF(left-additionalCursorSpace, top - additionalCursorSpace, right + additionalCursorSpace, bottom + additionalCursorSpace);
+        canvas.drawRect(cursorActual,paint);
     }
     private void DrawPage(Page page, Canvas canvas)
     {
@@ -75,8 +80,8 @@ public class PageView extends View {
             //    subline.Color = mColor;
             //if (page.Lines[i].IsFirstInParagraph && i !=0)
             //{
-                DrawLine(line, canvas, currentheight + lineHeight + lineSpacing, screenWidth - paddings.getPaddingLeft() - paddings.getPaddingRight());
-                currentheight += lineHeight + lineSpacing;
+                DrawLine(line, canvas, currentheight + lineHeight, screenWidth - paddings.getPaddingLeft() - paddings.getPaddingRight());
+                currentheight += lineHeight /*+ lineSpacing*/;
             //}
             /*else
             {
@@ -138,4 +143,49 @@ public class PageView extends View {
          canvas.drawText(text.getValue(), x, y, paint);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        if (isCursorState)
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                if (isCursorTouched(x,y)){
+                    isCursorMovingState = true;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if (isCursorMovingState)
+                    isCursorMovingState = false;
+                break;
+                case MotionEvent.ACTION_MOVE:
+                    if (isCursorMovingState){
+                        cursorCoordinates.set(x,y);
+                        invalidate();
+                    }
+        }
+        gestureDetector.onTouchEvent(event);
+        return true;
+    }
+
+    private boolean isCursorTouched(float x, float y){
+        if (x<= cursorForUserTouch.right && x >= cursorForUserTouch.left && y <= cursorForUserTouch.bottom && y >= cursorForUserTouch.top)
+            return true;
+        return  false;
+    }
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        public GestureListener() {
+            super();
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            super.onLongPress(e);
+            if (!isCursorState){
+                isCursorState = true;
+                cursorCoordinates = new PointF(e.getX(),e.getY());
+                invalidate();
+            }
+        }
+    }
 }
