@@ -24,7 +24,9 @@ public class TextPaintHelper {
     public float measureText(Text text)
     {
         Paint paint = paints.getPaintForText(text);
-        return paint.measureText(text.getValue());
+        if (text instanceof SubWord && ((SubWord)text).isWithHyphen())
+            return paint.measureText(text.getValue()+"-");
+        else return paint.measureText(text.getValue());
     }
     public float getLineSpacing(Line line)
     {

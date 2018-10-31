@@ -1,9 +1,22 @@
 package com.plainprog.crystalbookreader;
 
+import android.graphics.PointF;
+import android.graphics.RectF;
+
 public class Text {
 
     private String value;
     private TextSettings settings;
+
+    public RectF getDrawRectangle() {
+        return drawRectangle;
+    }
+
+    public void setDrawRectangle(RectF drawRectangle) {
+        this.drawRectangle = drawRectangle;
+    }
+
+    private RectF drawRectangle;
 
     public Text(String value){
         this.value = value;

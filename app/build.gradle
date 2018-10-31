@@ -33,4 +33,5 @@ dependencies {
     implementation files('libs/w3c-dom-traversal.jar')
     implementation files('libs/zip4j_1.3.2.jar')
     implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.github.mfietz:JHyphenator:a4fe91911f71938084d7cadf744c930c339ed531'
 }

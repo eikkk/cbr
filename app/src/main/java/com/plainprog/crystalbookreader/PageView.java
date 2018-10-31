@@ -140,7 +140,16 @@ public class PageView extends View {
         //text.RenderHeight = y;
         //text.StartWidth = x;
         //if (!string.IsNullOrWhiteSpace(text.Value))
-         canvas.drawText(text.getValue(), x, y, paint);
+        if (text instanceof SubWord){
+            SubWord subWord = (SubWord)text;
+            if (subWord.isHyphenBefore())
+                canvas.drawText("-"+text.getValue(), x, y, paint);
+            else if (subWord.isHyphenAfter())
+                canvas.drawText(text.getValue()+"-", x, y, paint);
+            else canvas.drawText(text.getValue(), x, y, paint);
+        }else{
+            canvas.drawText(text.getValue(), x, y, paint);
+        }
     }
 
     @Override
