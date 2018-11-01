@@ -19,6 +19,7 @@ public abstract class Book {
     private String title;
     private ArrayList<Author> authors;
     private ArrayList<Chapter> chapters;
+    private Language language;
 
     public String getTitle() {
         return title;
@@ -30,6 +31,14 @@ public abstract class Book {
 
     public ArrayList<Chapter> getChapters() {
         return chapters;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(Language language) {
+        this.language = language;
     }
 
     public Book(){

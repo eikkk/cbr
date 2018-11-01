@@ -24,15 +24,15 @@ public class Paginator {
     }
     public ArrayList<PaginatedChapter> Paginate(Book book){
         for (Chapter chapter : book.getChapters())
-            paginatedChapters.add(PaginateChapter(chapter));
+            paginatedChapters.add(PaginateChapter(chapter, book.getLanguage()));
         return paginatedChapters;
     }
-    private PaginatedChapter PaginateChapter(Chapter chapter){
+    private PaginatedChapter PaginateChapter(Chapter chapter, Language language){
         currentChapterPages = new ArrayList<>();
         for(BookItem item : chapter.getBookItems()){
             if (item instanceof BookTextItem){
                 LineBreaker lineBreaker = new LineBreaker();
-                LinedBookTextItem linedItem = lineBreaker.BreakParagraph((BookTextItem) item,paints,maxWidth);
+                LinedBookTextItem linedItem = lineBreaker.BreakParagraph((BookTextItem) item,paints,language,maxWidth);
                 placeBookItemOnPages(linedItem);
             }
             else if (item instanceof BookMediaItem){

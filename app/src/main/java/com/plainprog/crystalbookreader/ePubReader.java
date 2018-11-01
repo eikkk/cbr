@@ -27,6 +27,8 @@ public class ePubReader implements BookReaderBridge {
         String title = tempBook.getTitle();
         ArrayList<nl.siegmann.epublib.domain.Author> tempAuthors = new ArrayList<>(tempBook.getMetadata().getAuthors());
         ArrayList<Author> authors = new ArrayList<>();
+        String langStr = tempBook.getMetadata().getLanguage();
+        Language language = new Language(langStr);
         for (nl.siegmann.epublib.domain.Author item: tempAuthors)
             authors.add(new Author(item.getFirstname() + item.getLastname()));
 
@@ -40,6 +42,7 @@ public class ePubReader implements BookReaderBridge {
         book.setTitle(title);
         book.setAuthors(authors);
         book.setChapters(chapters);
+        book.setLanguage(language);
         return book;
     }
     private void initializeEpubLibBook(File file){
