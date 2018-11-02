@@ -55,7 +55,7 @@ public class SAXParserEventHandler extends DefaultHandler {
                 if (currentString.length()!= 0){
                     TextFromXml text = new TextFromXml(currentString.toString());
                     text.setupAccordingToHistory(nodeHistory);
-                    currentParagraph.add(new Text(currentString.toString()));
+                    //currentParagraph.add(new Text(currentString.toString()));
                 }
                 currentString = new StringBuilder();
                 BookTextItem paragraph = new BookTextItem(currentParagraph, true);

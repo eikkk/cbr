@@ -30,12 +30,22 @@ public class SubWord extends Text {
     }
 
     private boolean hyphenBefore;
+    private boolean spaceAfter;
+
+    public boolean isSpaceAfter() {
+        return spaceAfter;
+    }
+
+    public void setSpaceAfter(boolean spaceAfter) {
+        this.spaceAfter = spaceAfter;
+    }
 
     public SubWord(String value, TextSettings settings, Text word) {
-        super(value, settings);
+        super(value, settings,word.getBookItem());
         this.word = word;
         hyphenAfter = false;
         hyphenBefore = false;
+        spaceAfter = false;
     }
     public boolean isWithHyphen(){
         if (hyphenBefore || hyphenAfter)

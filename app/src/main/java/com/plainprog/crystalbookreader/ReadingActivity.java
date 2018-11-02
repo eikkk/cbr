@@ -39,7 +39,7 @@ public class ReadingActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager){
 
         int textSize = 50;
-        Paddings paddings = new Paddings(10,10,10,10);
+        Paddings paddings = new Paddings(30,30,20,20);
         Pagination pagination = new Pagination(book,getDisplayDimensions(),new TextPaintCollection(textSize),paddings);
         ViewPagerBookAdapter adapter = new ViewPagerBookAdapter(this, pagination);
         viewPager.setAdapter(adapter);

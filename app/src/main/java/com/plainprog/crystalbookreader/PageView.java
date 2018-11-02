@@ -74,10 +74,6 @@ public class PageView extends View {
             Line line = page.getLines().get(i);
             float lineHeight = paints.getHelper().measureLineHeight(line);
             float lineSpacing = paints.getHelper().getLineSpacing(line);
-            //setting color to sublines. we cant do it in DrawLine method because that method is used by drawing translated text and sublines have not drchsentences there
-            //foreach (Subline subline in page.Lines[i].Sublines)
-            //if(mDarchSentence.Equals(subline.darchSentence))
-            //    subline.Color = mColor;
             //if (page.Lines[i].IsFirstInParagraph && i !=0)
             //{
                 DrawLine(line, canvas, currentheight + lineHeight, screenWidth - paddings.getPaddingLeft() - paddings.getPaddingRight());
@@ -101,45 +97,60 @@ public class PageView extends View {
     }
     private void DrawLine(Line line, Canvas canvas, float y, float maxWidth)
     {
-        //line.EndHeight = y + paddingTop;
-        //line.StartHeight = line.EndHeight - line.LineHeight;
-        int partscount = 0;
+        if (line.getContent().size() == 0)
+            return;
+
+
         float currentwidth = 0f;
-        //float spacewidth = paints.MeasureText(new Text(" ", line.Sublines[0].Content[0].Type));
-        float partsWidth = 0f;
+        float lineWidth = paints.getHelper().measureLine(line);
+        float spaceWidth = paints.getHelper().getSpaceWidth(line.getContent().get(0));
+        float spaceForLine = maxWidth;
+        float additionalSpaceWidth = spaceWidth;
+        float spaceCount = line.getSpaceCount();
 
-        /*foreach(Subline subline in line.Sublines)
-        {
-            subline.StartHeight = line.StartHeight;
-            subline.EndHeight = subline.StartHeight + line.LineHeight;
-            foreach (Text el in subline.Content)
-            {
-                partsWidth += el.Width;
-                partscount++;
+
+        for (int q = 0; q < line.getContent().size(); q++) {
+            Text text = line.getContent().get(q);
+            float textWidth = paints.getHelper().measureText(text);
+            if (text.getBookItem() instanceof HeaderItem){
+                float startY = y + paddings.getPaddingTop();
+                if (q==0)
+                    currentwidth =( maxWidth-lineWidth)/2 + paddings.getPaddingLeft();
+                DrawText(text, canvas,currentwidth, startY);
+                currentwidth += textWidth;
             }
-        }*/
-        //int spacescount = partscount - 1;
-        //float spaceToFill = maxWidth - partsWidth;
-        //float singleSpaceWidth = spaceToFill / spacescount;
-
-        //line.Sublines[line.Sublines.Count - 1].Content[line.Sublines[line.Sublines.Count - 1].Content.Count - 1].Value = line.Sublines[line.Sublines.Count - 1].Content[line.Sublines[line.Sublines.Count - 1].Content.Count - 1].Value.TrimEnd();
-
-            for (int q = 0; q < line.getContent().size(); q++)
-            {
-                //line.Sublines[q].StartWidth = currentwidth;
-                    DrawText(line.getContent().get(q), canvas, currentwidth + paddings.getPaddingLeft(), y + paddings.getPaddingTop());
-                    currentwidth += paints.getHelper().measureText(line.getContent().get(q));
+            else if (text.getBookItem() instanceof ParagraphItem){
+                if (q==0){
+                    currentwidth = paddings.getPaddingLeft();
+                    if (text.getSettings().isFirstInParagraph()){
+                        currentwidth += TextDrawingConstants.paragraphStartSpace;
+                        spaceForLine -= TextDrawingConstants.paragraphStartSpace;
+                    }
+                    additionalSpaceWidth = (spaceForLine - lineWidth)/spaceCount;
+                }
+                DrawText(text,canvas,currentwidth,y+paddings.getPaddingTop());
+                currentwidth += textWidth;
+                if (!text.getSettings().isInLastLineOfParagraph()){
+                    if (!(text instanceof SubWord)){
+                        if ( q!= line.getContent().size()-1)
+                            currentwidth += additionalSpaceWidth;
+                    }
+                    else if (((SubWord)text).isSpaceAfter())
+                        currentwidth += additionalSpaceWidth;
+                }
             }
+            else{
+                DrawText(text, canvas, currentwidth + paddings.getPaddingLeft(), y + paddings.getPaddingTop());
+                currentwidth += textWidth;
 
 
+            }
+        }
     }
     private void DrawText(Text text, Canvas canvas,float x, float y)
     {
         Paint paint = new Paint(paints.getPaintForText(text));
         paint.setColor(Color.parseColor("#000000"));
-        //text.RenderHeight = y;
-        //text.StartWidth = x;
-        //if (!string.IsNullOrWhiteSpace(text.Value))
         if (text instanceof SubWord){
             SubWord subWord = (SubWord)text;
             if (subWord.isHyphenBefore())

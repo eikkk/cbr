@@ -95,7 +95,7 @@ public class ePubDOMReader {
         NodeList nodes;
         if (node.getNodeType() == Node.TEXT_NODE){
             if (!node.getTextContent().isEmpty() && !node.getTextContent().trim().isEmpty()){
-            currentBookItem.addContent(new Text(node.getTextContent()));
+            currentBookItem.addContent(new Text(node.getTextContent(),currentBookItem));
             chapterContent.add(currentBookItem);
             currentBookItem = new BookTextItem();
             }
@@ -242,7 +242,7 @@ public class ePubDOMReader {
 
         if (node.getNodeType() == Node.TEXT_NODE){
             if (!node.getTextContent().isEmpty() && !node.getTextContent().trim().isEmpty())
-                currentBookItem.addContent(new Text(node.getTextContent()));
+                currentBookItem.addContent(new Text(node.getTextContent(),currentBookItem));
             return;
         }
 

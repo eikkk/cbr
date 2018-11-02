@@ -22,7 +22,7 @@ public class BookTextItem extends BookItem {
                     String word = words[i];
                     if (i != words.length-1)
                         word = word+" ";
-                        result.add(new Word(word, text.getSettings()));
+                        result.add(new Word(word, text.getSettings(),this));
                 }
         }
         this.content = result;
@@ -40,7 +40,7 @@ public class BookTextItem extends BookItem {
             for(int i = 0; i < words.length; i++)
                 if (!words[i].isEmpty() && !words[i].trim().isEmpty()){
                     String word = words[i] + " ";
-                    result.add(new Word(word, text.getSettings()));
+                    result.add(new Word(word, text.getSettings(),this));
                 }
         this.content = result;
     }

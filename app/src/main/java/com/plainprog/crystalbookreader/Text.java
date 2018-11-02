@@ -7,6 +7,7 @@ public class Text {
 
     private String value;
     private TextSettings settings;
+    private BookTextItem bookItem;
 
     public RectF getDrawRectangle() {
         return drawRectangle;
@@ -18,26 +19,33 @@ public class Text {
 
     private RectF drawRectangle;
 
-    public Text(String value){
+    public Text(String value, BookTextItem bookItem){
         this.value = value;
         this.settings = new TextSettings();
         this.settings.setTextType(TextType.NORMAL);
         this.settings.setTextSize(TextSize.NORMAL);
         this.settings.setTextSpecification(TextSpecification.NONE);
         this.settings.setTextPosition(TextPosition.NORMAL);
+        this.bookItem = bookItem;
     }
 
     public TextSettings getSettings() {
         return settings;
     }
 
+    public BookTextItem getBookItem() {
+        return bookItem;
+    }
+
     public  Text(Text text){
         value = new String(text.getValue());
         settings = new TextSettings(text.getSettings());
+        this.bookItem = text.getBookItem();
     }
-    public Text(String value, TextSettings settings){
+    public Text(String value, TextSettings settings, BookTextItem bookItem){
         this.value = value;
         this.settings = new TextSettings(settings);
+        this.bookItem = bookItem;
     }
 
     public String getValue() {

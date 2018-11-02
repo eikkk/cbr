@@ -1,9 +1,13 @@
 package com.plainprog.crystalbookreader;
 
 public class TextFromXml extends Text {
-    public TextFromXml(String value) {
-        super(value);
+    public TextFromXml(String value, BookTextItem bookItem) {
+        super(value, bookItem);
     }
+    public TextFromXml(String value) {
+        super(value, new BookTextItem());
+    }
+
     public void setupAccordingToHistory(TextXmlElementHistory history){
         setupPositionAccordingToHistory(history);
         setupSizeAccordingToHistory(history);
@@ -60,9 +64,7 @@ public class TextFromXml extends Text {
         else getSettings().setTextSpecification(TextSpecification.NONE);
     }
     private void setupPositionAccordingToHistory(TextXmlElementHistory history){
-        if (history.hasAnyHeaderNode())
-            getSettings().setTextPosition(TextPosition.CENTER_HORIZONTALLY);
-        else if (history.contains("sub"))
+        if (history.contains("sub"))
             getSettings().setTextPosition(TextPosition.SUBSCRIPT);
         else  if (history.contains("sup"))
             getSettings().setTextPosition(TextPosition.SUPERSCRIPT);

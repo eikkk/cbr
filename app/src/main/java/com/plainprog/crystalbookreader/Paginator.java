@@ -29,11 +29,18 @@ public class Paginator {
     }
     private PaginatedChapter PaginateChapter(Chapter chapter, Language language){
         currentChapterPages = new ArrayList<>();
-        for(BookItem item : chapter.getBookItems()){
+        currentPage = new Page();
+        currentHeight = 0f;
+        for(int i =0; i < chapter.getBookItems().size();i++){
+            BookItem item = chapter.getBookItems().get(i);
             if (item instanceof BookTextItem){
                 LineBreaker lineBreaker = new LineBreaker();
-                LinedBookTextItem linedItem = lineBreaker.BreakParagraph((BookTextItem) item,paints,language,maxWidth);
+                LinedBookTextItem linedItem = lineBreaker.BreakBookTextItem((BookTextItem) item,paints,language,maxWidth);
                 placeBookItemOnPages(linedItem);
+                if (i == chapter.getBookItems().size()-1){
+                    currentChapterPages.add(currentPage);
+
+                }
             }
             else if (item instanceof BookMediaItem){
 

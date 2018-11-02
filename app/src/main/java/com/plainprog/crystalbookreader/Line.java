@@ -21,4 +21,17 @@ public class Line {
     public ArrayList<Text> getContent() {
         return content;
     }
+    public int getSpaceCount(){
+        int count = 0;
+        for(int i =0; i < content.size();i++){
+            Text text = content.get(i);
+            if (!(text instanceof SubWord)){
+                if (i != content.size()-1)
+                    count++; // if its last word in line we don't set space there
+            }
+            else if (((SubWord)text).isSpaceAfter())
+                count++;
+        }
+        return count;
+    }
 }
